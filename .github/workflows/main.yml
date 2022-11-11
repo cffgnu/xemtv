@@ -1,0 +1,39 @@
+name: Run xemtv cron
+
+on:
+  schedule:
+    - cron: "0 */2 * * *"
+
+  workflow_dispatch:
+    inputs:
+      token:
+        description: 'secret token'
+        required: true
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+    
+    - name: docker registry login
+      run: echo "${{  secrets.DOCKER_CONTAINER_REGISTRY_TOKEN }}" | docker login ghcr.io --username hoangweb --password-stdin
+    
+    - name: Public IP
+      id: ip
+      uses: haythem/public-ip@v1.2
+
+    - name: Print Public IP
+      run: |
+        echo ${{ steps.ip.outputs.ipv4 }}
+        echo ${{ steps.ip.outputs.ipv6 }}
+
+    - name: Run jobs
+      if: success()
+      run: |
+        docker run \
+        -e TASK="cron" \
+        -e SERVER_IP="${{ steps.ip.outputs.ipv4 }}" \
+        ghcr.io/hoangweb/xemtv:latest
