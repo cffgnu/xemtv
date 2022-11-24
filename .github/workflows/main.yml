@@ -35,6 +35,6 @@ jobs:
       run: |
         docker run \
         -e TASK="cron" \
-        -e WP_DATABASE_URL="${{  secrets.WP_DATABASE_URL }}"
+        -e WP_DATABASE_URL="${{  secrets.WP_DATABASE_URL }}" \
         -e SERVER_IP="${{ steps.ip.outputs.ipv4 }}" \
         ghcr.io/hoangweb/xemtv:latest
